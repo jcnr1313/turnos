@@ -19,6 +19,8 @@
             --accent-guard: #fee2e2;
             --accent-guard-text: #991b1b;
             --current-week: #fef08a;
+            --dual-shift-bg: rgba(59, 130, 246, 0.08);
+            --dual-shift-border: #3b82f6;
             --text-color: #334155;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
@@ -36,6 +38,8 @@
             --accent-guard: #7f1d1d;
             --accent-guard-text: #fee2e2;
             --current-week: #854d0e;
+            --dual-shift-bg: rgba(59, 130, 246, 0.15);
+            --dual-shift-border: #60a5fa;
             --text-color: #f1f5f9;
             --bg-color: #0f172a;
             --card-bg: #1e293b;
@@ -87,7 +91,7 @@
         .header-logo {
             width: 55px;
             height: 35px;
-            object-contain: contain;
+            object-fit: contain;
             border-radius: 6px;
             background: #fff;
             padding: 2px;
@@ -119,7 +123,6 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* Tarjeta de estado de hoy */
         .today-banner {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
@@ -215,6 +218,16 @@
             background-color: var(--current-week) !important;
             font-weight: bold;
             color: #000;
+        }
+
+        /* Efecto visual exclusivo para semanas con ambos turnos (LUCAS / JACOBO) */
+        tr.is-dual-shift {
+            background-color: var(--dual-shift-bg);
+            position: relative;
+        }
+
+        tr.is-dual-shift td:first-child {
+            border-left: 5px solid var(--dual-shift-border);
         }
 
         tr.highlighted {
@@ -328,7 +341,7 @@
         </div>
 
         <div class="notices-box">
-            <strong>📢 Nota informativa:</strong> Los turnos y la guardia se rotan semanalmente según el calendario establecido. Cualquier cambio será comunicado con anticipación.
+            <strong>📢 Nota informativa:</strong> Los turnos y la guardia se rotan semanalmente según el calendario establecido. Las semanas con ambos turnos conjuntos están resaltadas de forma especial.
         </div>
 
         <div class="table-responsive">
@@ -347,9 +360,10 @@
         </div>
 
         <div class="legend">
-            <div class="legend-item"><span class="dot" style="background: #0369a1;"></span> Mañana (08:00 - 16:00)</div>
-            <div class="legend-item"><span class="dot" style="background: #be185d;"></span> Tarde (09:00 - 19:00)</div>
-            <div class="legend-item"><span class="dot" style="background: #991b1b;"></span> Guardia Rotativa</div>
+            <div class="legend-item"><span class="dot" style="background: #0369a1;"></span> Mañana</div>
+            <div class="legend-item"><span class="dot" style="background: #be185d;"></span> Tarde</div>
+            <div class="legend-item"><span class="dot" style="background: #991b1b;"></span> Guardia</div>
+            <div class="legend-item"><span class="dot" style="background: #3b82f6;"></span> Semana Lucas/Jacobo</div>
             <div class="legend-item"><span class="dot" style="background: #fef08a; border: 1px solid #ca8a04;"></span> Semana Actual</div>
         </div>
 
@@ -384,11 +398,16 @@
             tbody.innerHTML = "";
             const today = new Date();
 
-            scheduleData.forEach((row, index) => {
+            scheduleData.forEach((row) => {
                 const tr = document.createElement("tr");
                 tr.setAttribute("data-morning", row.morning);
                 tr.setAttribute("data-afternoon", row.afternoon);
                 tr.setAttribute("data-guard", row.guard);
+
+                // Detección automática de semanas con ambos turnos (LUCAS / JACOBO)
+                if (row.morning.includes("LUCAS / JACOBO") || row.afternoon.includes("LUCAS / JACOBO")) {
+                    tr.classList.add("is-dual-shift");
+                }
 
                 const startDate = new Date(row.dateObj);
                 const endDate = new Date(startDate);
