@@ -3,16 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horario de Turnos y Guardias</title>
+    <title>Gestor de Turnos y Guardias</title>
     <style>
         :root {
             --primary-color: #0b1f3b;
             --secondary-color: #1e3a8a;
             --accent-morning: #e0f2fe;
+            --accent-morning-text: #0369a1;
             --accent-afternoon: #fce7f3;
+            --accent-afternoon-text: #be185d;
+            --accent-guard: #fee2e2;
+            --accent-guard-text: #991b1b;
             --current-week: #fef08a;
             --text-color: #334155;
             --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --header-text: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #1e293b;
+            --secondary-color: #334155;
+            --accent-morning: #075985;
+            --accent-morning-text: #e0f2fe;
+            --accent-afternoon: #831843;
+            --accent-afternoon-text: #fce7f3;
+            --accent-guard: #7f1d1d;
+            --accent-guard-text: #fee2e2;
+            --current-week: #854d0e;
+            --text-color: #f1f5f9;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --header-text: #f8fafc;
         }
 
         * {
@@ -20,6 +44,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         body {
@@ -29,41 +54,83 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         header {
             background-color: var(--primary-color);
-            color: white;
-            text-align: center;
-            padding: 24px;
+            color: var(--header-text);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         header h1 {
-            font-size: 1.6rem;
-            margin-bottom: 6px;
-            letter-spacing: 0.5px;
+            font-size: 1.5rem;
+            margin-bottom: 4px;
         }
 
         header p {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             opacity: 0.8;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: var(--header-text);
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Tarjeta de estado de hoy */
+        .today-banner {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .today-info h3 {
+            font-size: 1rem;
+            margin-bottom: 2px;
+            opacity: 0.9;
+        }
+
+        .today-info p {
+            font-size: 1.2rem;
+            font-weight: bold;
         }
 
         .controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f1f5f9;
-            padding: 15px 20px;
-            border-bottom: 1px solid #e2e8f0;
+            background: var(--bg-color);
+            padding: 15px 24px;
+            border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
 
         .filter-container label {
@@ -73,10 +140,20 @@
         }
 
         .filter-container select {
-            padding: 6px 12px;
+            padding: 8px 12px;
             border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            background: white;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .notices-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 12px 20px;
+            margin: 15px 24px;
+            border-radius: 0 6px 6px 0;
             font-size: 0.9rem;
         }
 
@@ -88,7 +165,7 @@
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         th {
@@ -97,61 +174,68 @@
             padding: 14px 12px;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             letter-spacing: 0.5px;
         }
 
         td {
             padding: 14px 12px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
         }
 
         tr:hover {
-            background-color: #f8fafc;
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        [data-theme="dark"] tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
         }
 
         tr.is-current {
             background-color: var(--current-week) !important;
             font-weight: bold;
+            color: #000;
         }
 
         tr.highlighted {
             outline: 2px solid #3b82f6;
         }
 
-        .badge-morning {
-            background-color: var(--accent-morning);
-            color: #0369a1;
-            padding: 4px 8px;
-            border-radius: 4px;
+        .badge {
+            padding: 5px 10px;
+            border-radius: 6px;
             display: inline-block;
             font-weight: 500;
+            font-size: 0.85rem;
         }
 
-        .badge-afternoon {
-            background-color: var(--accent-afternoon);
-            color: #be185d;
+        .badge-morning { background-color: var(--accent-morning); color: var(--accent-morning-text); }
+        .badge-afternoon { background-color: var(--accent-afternoon); color: var(--accent-afternoon-text); }
+        .badge-guard { background-color: var(--accent-guard); color: var(--accent-guard-text); }
+
+        .btn-ics {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
             padding: 4px 8px;
             border-radius: 4px;
-            display: inline-block;
-            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-top: 4px;
         }
 
-        .badge-guard {
-            background-color: #fee2e2;
-            color: #991b1b;
-            padding: 4px 8px;
-            border-radius: 4px;
-            display: inline-block;
-            font-weight: 500;
+        .btn-ics:hover {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
         }
 
         .legend {
             display: flex;
             justify-content: space-around;
-            background: #f8fafc;
+            background: var(--bg-color);
             padding: 15px;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid var(--border-color);
             font-size: 0.85rem;
             flex-wrap: wrap;
             gap: 10px;
@@ -173,41 +257,56 @@
             text-align: center;
             padding: 15px;
             font-size: 0.8rem;
-            color: #64748b;
-            background: #f1f5f9;
-            border-top: 1px solid #e2e8f0;
+            opacity: 0.7;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
         }
 
         @media (max-width: 600px) {
             body { padding: 5px; }
-            th, td { padding: 10px 8px; font-size: 0.85rem; }
+            th, td { padding: 10px 8px; font-size: 0.8rem; }
         }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
     <div class="container">
         <header>
-            <h1>HORARIO DE TURNOS</h1>
-            <p>Vigencia: 02 de octubre – 28 de enero</p>
+            <div>
+                <h1>HORARIO DE TURNOS</h1>
+                <p>Vigencia: 02 de octubre – 28 de enero</p>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 Modo Oscuro</button>
         </header>
+
+        <!-- Tarjeta dinámica de estado actual -->
+        <div class="today-banner">
+            <div class="today-info">
+                <h3 id="userTodayTitle">Selecciona tu usuario para ver tu turno hoy:</h3>
+                <p id="userTodayStatus">-</p>
+            </div>
+            <div style="font-size: 2rem;">🗓️</div>
+        </div>
 
         <div class="controls">
             <div class="filter-container">
-                <label for="employeeFilter">Filtrar por empleado:</label>
-                <select id="employeeFilter" onchange="filterTable()">
-                    <option value="todos">-- Todos --</option>
+                <label for="employeeFilter">👤 Filtrar vista:</label>
+                <select id="employeeFilter" onchange="updateView()">
+                    <option value="todos">-- Mostrar Todos --</option>
                     <option value="LUCAS">Lucas</option>
                     <option value="JACOBO">Jacobo</option>
                     <option value="OSCARS">Óscars</option>
                     <option value="ÓSCAR IDAÑEZ">Óscar Idañez</option>
-                    <option value="J. CARLOS">J. Carlos</option>
                     <option value="ÓSCAR IBARRETA">Óscar Ibarreta</option>
                 </select>
             </div>
-            <div id="currentIndicator" style="font-size: 0.85rem; color: #475569; font-weight: 600;">
+            <div style="font-size: 0.85rem; font-weight: 600;">
                 ⭐ Semana Actual Resaltada
             </div>
+        </div>
+
+        <div class="notices-box">
+            <strong>📢 Nota informativa:</strong> Los turnos y la guardia se rotan semanalmente según el calendario establecido. Cualquier cambio será comunicado con anticipación.
         </div>
 
         <div class="table-responsive">
@@ -221,50 +320,48 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    </tbody>
+                    <!-- Dinámico por JS -->
+                </tbody>
             </table>
         </div>
 
         <div class="legend">
-            <div class="legend-item"><span class="dot" style="background: #0369a1;"></span> Mañana: 08:00 - 16:00</div>
-            <div class="legend-item"><span class="dot" style="background: #be185d;"></span> Tarde: 09:00 - 19:00</div>
+            <div class="legend-item"><span class="dot" style="background: #0369a1;"></span> Mañana (08:00 - 16:00)</div>
+            <div class="legend-item"><span class="dot" style="background: #be185d;"></span> Tarde (09:00 - 19:00)</div>
             <div class="legend-item"><span class="dot" style="background: #991b1b;"></span> Guardia Rotativa</div>
             <div class="legend-item"><span class="dot" style="background: #fef08a; border: 1px solid #ca8a04;"></span> Semana Actual</div>
         </div>
 
         <footer>
-            Los turnos y la guardia se rotan semanalmente según el calendario establecido.
+            Gestor de Turnos Inteligente &copy; 2026
         </footer>
     </div>
 
     <script>
-        // Datos extraídos directamente de la imagen de turnos
+        // Datos limpios sin J. Carlos y adaptando rotaciones de guardia restantes (Óscar Idañez, Óscar Ibarreta, Lucas, Jacobo)
         const scheduleData = [
-            { start: "02 oct", end: "08 oct", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", startDate: "2023-10-02" },
-            { start: "09 oct", end: "15 oct", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "J. CARLOS", startDate: "2023-10-09" },
-            { start: "16 oct", end: "22 oct", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IBARRETA", startDate: "2023-10-16" },
-            { start: "23 oct", end: "29 oct", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "LUCAS", startDate: "2023-10-23" },
-            { start: "30 oct", end: "05 nov", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", startDate: "2023-10-30" },
-            { start: "06 nov", end: "12 nov", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "JACOBO", startDate: "2023-11-06" },
-            { start: "13 nov", end: "19 nov", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IBARRETA", startDate: "2023-11-13" },
-            { start: "20 nov", end: "26 nov", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "LUCAS", startDate: "2023-11-20" },
-            { start: "27 nov", end: "03 dic", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", startDate: "2023-11-27" },
-            { start: "04 dic", end: "10 dic", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "JACOBO", startDate: "2023-12-04" },
-            { start: "11 dic", end: "17 dic", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IBARRETA", startDate: "2023-12-11" },
-            { start: "18 dic", end: "24 dic", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "LUCAS", startDate: "2023-12-18" },
-            { start: "25 dic", end: "31 dic", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", startDate: "2023-12-25" },
-            { start: "01 ene", end: "07 ene", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "JACOBO", startDate: "2024-01-01" },
-            { start: "08 ene", end: "14 ene", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IBARRETA", startDate: "2024-01-08" },
-            { start: "15 ene", end: "21 ene", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "LUCAS", startDate: "2024-01-15" },
-            { start: "22 ene", end: "28 ene", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", startDate: "2024-01-22" }
+            { start: "02 oct", end: "08 oct", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", dateObj: "2023-10-02" },
+            { start: "09 oct", end: "15 oct", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "ÓSCAR IBARRETA", dateObj: "2023-10-09" },
+            { start: "16 oct", end: "22 oct", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "LUCAS", dateObj: "2023-10-16" },
+            { start: "23 oct", end: "29 oct", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "JACOBO", dateObj: "2023-10-23" },
+            { start: "30 oct", end: "05 nov", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", dateObj: "2023-10-30" },
+            { start: "06 nov", end: "12 nov", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "ÓSCAR IBARRETA", dateObj: "2023-11-06" },
+            { start: "13 nov", end: "19 nov", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "LUCAS", dateObj: "2023-11-13" },
+            { start: "20 nov", end: "26 nov", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "JACOBO", dateObj: "2023-11-20" },
+            { start: "27 nov", end: "03 dic", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", dateObj: "2023-11-27" },
+            { start: "04 dic", end: "10 dic", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "ÓSCAR IBARRETA", dateObj: "2023-12-04" },
+            { start: "11 dic", end: "17 dic", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "LUCAS", dateObj: "2023-12-11" },
+            { start: "18 dic", end: "24 dic", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "JACOBO", dateObj: "2023-12-18" },
+            { start: "25 dic", end: "31 dic", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", dateObj: "2023-12-25" },
+            { start: "01 ene", end: "07 ene", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "ÓSCAR IBARRETA", dateObj: "2024-01-01" },
+            { start: "08 ene", end: "14 ene", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "LUCAS", dateObj: "2024-01-08" },
+            { start: "15 ene", end: "21 ene", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "JACOBO", dateObj: "2024-01-15" },
+            { start: "22 ene", end: "28 ene", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", dateObj: "2024-01-22" }
         ];
 
         function renderTable() {
             const tbody = document.getElementById("tableBody");
             tbody.innerHTML = "";
-
-            // Para simulación visual o fecha actual real:
-            // Comparamos con la fecha de hoy para detectar la semana actual
             const today = new Date();
 
             scheduleData.forEach((row, index) => {
@@ -273,29 +370,32 @@
                 tr.setAttribute("data-afternoon", row.afternoon);
                 tr.setAttribute("data-guard", row.guard);
 
-                // Lógica aproximada para marcar la semana actual (puedes ajustar el año de prueba si lo deseas)
-                // Usaremos una simulación basada en el índice si la fecha actual no coincide con 2023/2024 exactas, 
-                // o puedes dejar la validación real de fechas:
-                const startDate = new Date(row.startDate);
-                // Damos por buena una ventana de 7 días por cada fila
+                const startDate = new Date(row.dateObj);
                 const endDate = new Date(startDate);
                 endDate.setDate(endDate.getDate() + 7);
 
-                // Opcional: si quieres forzar una semana activa para pruebas visuales, descomenta la línea de abajo:
-                // if (index === 0) tr.classList.add("is-current"); 
-
+                // Detectar semana actual (si la fecha actual encaja o simulamos la primera para pruebas)
                 if (today >= startDate && today <= endDate) {
                     tr.classList.add("is-current");
                 }
 
                 tr.innerHTML = `
-                    <td><strong>${row.start} – ${row.end}</strong></td>
-                    <td><span class="badge-morning">${row.morning}</span></td>
-                    <td><span class="badge-afternoon">${row.afternoon}</span></td>
-                    <td><span class="badge-guard">${row.guard}</span></td>
+                    <td>
+                        <strong>${row.start} – ${row.end}</strong><br>
+                        <button class="btn-ics" onclick="downloadICS('${row.start}', '${row.end}', '${row.morning}', '${row.afternoon}', '${row.guard}')">📅 .ics</button>
+                    </td>
+                    <td><span class="badge badge-morning">${row.morning}</span></td>
+                    <td><span class="badge badge-afternoon">${row.afternoon}</span></td>
+                    <td><span class="badge badge-guard">${row.guard}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
+            updateTodayStatus();
+        }
+
+        function updateView() {
+            filterTable();
+            updateTodayStatus();
         }
 
         function filterTable() {
@@ -311,7 +411,6 @@
                     const afternoon = row.getAttribute("data-afternoon");
                     const guard = row.getAttribute("data-guard");
 
-                    // Comprobamos si el empleado está en mañana, tarde o guardia
                     const matches = morning.includes(selectedFilter) || 
                                     afternoon.includes(selectedFilter) || 
                                     guard.includes(selectedFilter);
@@ -327,7 +426,57 @@
             });
         }
 
-        // Inicializar la tabla al cargar la página
+        function updateTodayStatus() {
+            const selected = document.getElementById("employeeFilter").value;
+            const titleEl = document.getElementById("userTodayTitle");
+            const statusEl = document.getElementById("userTodayStatus");
+
+            if (selected === "todos") {
+                titleEl.innerText = "Estado general:";
+                statusEl.innerText = "Selecciona tu nombre en el filtro para ver tu asignación.";
+                return;
+            }
+
+            // Buscamos la fila que corresponda a la semana actual (o cogemos la primera activa / índice 0 de ejemplo)
+            const currentRow = document.querySelector("#tableBody tr.is-current") || document.querySelector("#tableBody tr");
+            if (!currentRow) return;
+
+            const morning = currentRow.getAttribute("data-morning");
+            const afternoon = currentRow.getAttribute("data-afternoon");
+            const guard = currentRow.getAttribute("data-guard");
+
+            let assigned = [];
+            if (morning.includes(selected)) assigned.push("☀️ Turno Mañana (08:00 - 16:00)");
+            if (afternoon.includes(selected)) assigned.push("🌙 Turno Tarde (09:00 - 19:00)");
+            if (guard.includes(selected)) assigned.push("🚨 Guardia 24/7 Activa");
+
+            titleEl.innerText = `Turno actual para: ${selected}`;
+            statusEl.innerText = assigned.length > 0 ? assigned.join(" | ") : "Sin turnos principales esta semana.";
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.querySelector(".theme-toggle");
+            if (body.getAttribute("data-theme") === "light") {
+                body.setAttribute("data-theme", "dark");
+                btn.innerText = "☀️ Modo Claro";
+            } else {
+                body.setAttribute("data-theme", "light");
+                btn.innerText = "🌙 Modo Oscuro";
+            }
+        }
+
+        function downloadICS(start, end, morning, afternoon, guard) {
+            const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Turno de Trabajo (${start} - ${end})\nDESCRIPTION:Mañana: ${morning}\\nTarde: ${afternoon}\\nGuardia: ${guard}\nEND:VEVENT\nEND:VCALENDAR`;
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', `turno_${start.replace(' ', '_')}.ics`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         window.onload = renderTable;
     </script>
 </body>
