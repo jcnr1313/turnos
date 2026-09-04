@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Turnos y Guardias</title>
+    
+    <link rel="apple-touch-icon" href="logo.jpeg">
+    <link rel="icon" type="image/jpeg" href="logo.jpeg">
+
     <style>
         :root {
             --primary-color: #0b1f3b;
@@ -74,13 +78,29 @@
             gap: 15px;
         }
 
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-logo {
+            width: 55px;
+            height: 35px;
+            object-contain: contain;
+            border-radius: 6px;
+            background: #fff;
+            padding: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
         header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 4px;
+            font-size: 1.4rem;
+            margin-bottom: 2px;
         }
 
         header p {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             opacity: 0.8;
         }
 
@@ -272,14 +292,16 @@
 
     <div class="container">
         <header>
-            <div>
-                <h1>HORARIO DE TURNOS</h1>
-                <p>Vigencia: 02 de octubre – 28 de enero</p>
+            <div class="header-brand">
+                <img src="logo.jpeg" alt="Logo" class="header-logo">
+                <div>
+                    <h1>CONTROL DE TURNOS</h1>
+                    <p>Vigencia: 02 de octubre – 28 de enero</p>
+                </div>
             </div>
             <button class="theme-toggle" onclick="toggleTheme()">🌙 Modo Oscuro</button>
         </header>
 
-        <!-- Tarjeta dinámica de estado actual -->
         <div class="today-banner">
             <div class="today-info">
                 <h3 id="userTodayTitle">Selecciona tu usuario para ver tu turno hoy:</h3>
@@ -320,8 +342,7 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <!-- Dinámico por JS -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
 
@@ -338,7 +359,6 @@
     </div>
 
     <script>
-        // Datos limpios sin J. Carlos y adaptando rotaciones de guardia restantes (Óscar Idañez, Óscar Ibarreta, Lucas, Jacobo)
         const scheduleData = [
             { start: "02 oct", end: "08 oct", morning: "LUCAS / JACOBO", afternoon: "OSCARS", guard: "ÓSCAR IDAÑEZ", dateObj: "2023-10-02" },
             { start: "09 oct", end: "15 oct", morning: "OSCARS", afternoon: "LUCAS / JACOBO", guard: "ÓSCAR IBARRETA", dateObj: "2023-10-09" },
@@ -374,7 +394,6 @@
                 const endDate = new Date(startDate);
                 endDate.setDate(endDate.getDate() + 7);
 
-                // Detectar semana actual (si la fecha actual encaja o simulamos la primera para pruebas)
                 if (today >= startDate && today <= endDate) {
                     tr.classList.add("is-current");
                 }
@@ -437,7 +456,6 @@
                 return;
             }
 
-            // Buscamos la fila que corresponda a la semana actual (o cogemos la primera activa / índice 0 de ejemplo)
             const currentRow = document.querySelector("#tableBody tr.is-current") || document.querySelector("#tableBody tr");
             if (!currentRow) return;
 
