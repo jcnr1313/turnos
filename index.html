@@ -58,7 +58,7 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding: 20px;
+            padding: 15px;
         }
 
         .container {
@@ -123,7 +123,7 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* Contenedor doble para los banners superiores (Guardia global + Turno personal) */
+        /* Contenedor doble para los banners superiores optimizado para móvil y PC */
         .banners-wrapper {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -131,7 +131,7 @@
             background: var(--border-color);
         }
 
-        @media (max-width: 700px) {
+        @media (max-width: 768px) {
             .banners-wrapper {
                 grid-template-columns: 1fr;
             }
@@ -140,7 +140,7 @@
         .global-guard-banner, .today-banner {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
-            padding: 16px 24px;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -153,14 +153,17 @@
         }
 
         .today-info h3, .global-guard-info h3 {
-            font-size: 0.9rem;
-            margin-bottom: 2px;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
             opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .today-info p, .global-guard-info p {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: bold;
+            line-height: 1.4;
         }
 
         .controls {
@@ -187,6 +190,7 @@
             background: var(--card-bg);
             color: var(--text-color);
             font-size: 0.9rem;
+            max-width: 100%;
         }
 
         .notices-box {
@@ -200,6 +204,7 @@
 
         .table-responsive {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
@@ -207,6 +212,7 @@
             border-collapse: collapse;
             text-align: left;
             font-size: 0.9rem;
+            min-width: 600px;
         }
 
         th {
@@ -314,6 +320,8 @@
 
         @media (max-width: 600px) {
             body { padding: 5px; }
+            .controls, .notices-box { margin: 10px 12px; padding: 10px 12px; }
+            header { padding: 15px; }
             th, td { padding: 10px 8px; font-size: 0.8rem; }
         }
     </style>
@@ -332,14 +340,13 @@
             <button class="theme-toggle" onclick="toggleTheme()">🌙 Modo Oscuro</button>
         </header>
 
-        <!-- Sección superior con el indicador global de guardia y el filtro personal -->
         <div class="banners-wrapper">
             <div class="global-guard-banner">
                 <div class="global-guard-info">
-                    <h3>De guardia esta semana:</h3>
+                    <h3>Resumen de la semana actual:</h3>
                     <p id="globalGuardStatus">Cargando...</p>
                 </div>
-                <div style="font-size: 1.8rem;">🚨</div>
+                <div style="font-size: 1.8rem;">📋</div>
             </div>
             <div class="today-banner">
                 <div class="today-info">
@@ -463,8 +470,11 @@
             const currentRow = document.querySelector("#tableBody tr.is-current");
             
             if (currentRow) {
-                const guardName = currentRow.getAttribute("data-guard");
-                guardEl.innerText = guardName;
+                const morning = currentRow.getAttribute("data-morning");
+                const afternoon = currentRow.getAttribute("data-afternoon");
+                const guard = currentRow.getAttribute("data-guard");
+                
+                guardEl.innerHTML = `☀️ Mañana: ${morning}<br>🌙 Tarde: ${afternoon}<br>🚨 Guardia: ${guard}`;
             } else {
                 guardEl.innerText = "Fuera de periodo activo";
             }
